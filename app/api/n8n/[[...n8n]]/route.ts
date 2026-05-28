@@ -10,7 +10,6 @@ let n8nAppInstance: any = null;
 
 async function initN8n() {
   if (!n8nAppInstance) {
-    // N8nInstance ki jagah ab hum Instance use kar rahe hain
     n8nAppInstance = new Instance({
       database: {
         type: 'postgresdb',
