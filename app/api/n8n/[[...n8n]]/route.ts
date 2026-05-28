@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 // @ts-ignore
-import { N8nInstance } from 'n8n'; 
+import { Instance } from 'n8n'; 
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -9,7 +10,8 @@ let n8nAppInstance: any = null;
 
 async function initN8n() {
   if (!n8nAppInstance) {
-    n8nAppInstance = new N8nInstance({
+    // N8nInstance ki jagah ab hum Instance use kar rahe hain
+    n8nAppInstance = new Instance({
       database: {
         type: 'postgresdb',
         postgresdb: {
