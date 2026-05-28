@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // @ts-ignore
-import { Instance } from 'n8n'; 
+import { N8N } from 'n8n';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-let n8nAppInstance: any = null;
+let n8nInstance: any = null;
 
-async function initN8n() {
-  if (!n8nAppInstance) {
-    n8nAppInstance = new Instance({
+async function getN8NHandler() {
+  if (!n8nInstance) {
+    // Hum built-in N8N method use kar rahe hain jo internally sab handle karta hai
+    n8nInstance = await N8N.create({
       database: {
         type: 'postgresdb',
         postgresdb: {
@@ -20,21 +21,20 @@ async function initN8n() {
       security: {
         jwtSecret: process.env.N8N_JWT_SECRET || 'super-secure-32-character-jwt-secret-string',
       },
-      path: '/api/n8n', 
+      path: '/api/n8n',
     });
-    
-    await n8nAppInstance.init();
   }
-  return n8nAppInstance;
+  return n8nInstance;
 }
 
 export async function catchAllHandler(req: NextRequest) {
   try {
-    const instance = await initN8n();
-    const response = await instance.handleIncomingRequest(req);
+    const n8n = await getN8NHandler();
+    // Yeh line automatic request ko process karegi bina kisi error ke
+    const response = await n8n.handleRequest(req);
     return response;
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'n8n setup failed' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'n8n execution failed' }, { status: 500 });
   }
 }
 
